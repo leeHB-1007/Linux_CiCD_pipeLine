@@ -1,0 +1,24 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Delete Docker Image and Containers
+        run: |
+          sudo docker rm -f dweb || true  # 컨테이너가 존재하지 않을 경우 오류를 무시합니다.
+
+      - name: Pull Docker Image from Docker Hub
+        run: |
+          sudo docker pull hblee123/songdo:latest
+
+      - name: Execute Docker Container
+        run: |
+          sudo docker run -d -p 80:3000 --name hyunbin hblee123/songdo:latest
